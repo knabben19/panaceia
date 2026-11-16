@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panaceia — Agendamento unificado nos hospitais públicos de SC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F7F5;--surface:#fff;--ink:#0F2F36;--muted:#4F6A70;--line:#D3E2DE;--brand:#0B6E6E;--on-brand:#fff;--soft:#DCEFE9;--alert:#C8372D;--warn:#B77A0B;--ok:#1E7F4F;
+--fd:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--fb:"Public Sans","Segoe UI",system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1A1D;--surface:#13272B;--ink:#E6F1EF;--muted:#9DB6BA;--line:#254247;--brand:#4FC3B5;--on-brand:#04201E;--soft:#17353A;--alert:#FF7B70;--warn:#F0B13C;--ok:#5FD39A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0C1A1D;--surface:#13272B;--ink:#E6F1EF;--muted:#9DB6BA;--line:#254247;--brand:#4FC3B5;--on-brand:#04201E;--soft:#17353A;--alert:#FF7B70;--warn:#F0B13C;--ok:#5FD39A;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.6 var(--fb)}
+h1,h2,h3{font-family:var(--fd);line-height:1.1;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(2.6rem,6.5vw,4.6rem);font-weight:800}
+h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;margin-bottom:.6rem}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0 0 1rem;max-width:68ch}
+a{color:var(--brand)}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 1.25rem}
+section{padding:4.5rem 0}
+.lead{font-size:1.2rem;color:var(--muted)}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:62px}
+.logo{font:800 1.35rem var(--fd);color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.5rem}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--brand);position:relative;display:inline-block}
+.logo i::before,.logo i::after{content:"";position:absolute;background:var(--on-brand);border-radius:2px}
+.logo i::before{left:11px;top:5px;width:4px;height:16px}.logo i::after{left:5px;top:11px;width:16px;height:4px}
+nav{display:flex;gap:1.1rem;font-size:.95rem;overflow-x:auto}
+nav a{color:var(--muted);text-decoration:none;white-space:nowrap;font-weight:500}
+nav a:hover{color:var(--ink)}
+.btn{display:inline-block;border:0;cursor:pointer;font:600 1rem var(--fb);padding:.8rem 1.35rem;border-radius:10px;background:var(--brand);color:var(--on-brand);text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.danger{background:var(--alert);color:#fff}
+.hero{padding:3.5rem 0 4.5rem}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:3rem;align-items:start}
+.hero .lead{margin:1.4rem 0 1.8rem}
+.cta{display:flex;gap:.8rem;flex-wrap:wrap}
+.meta{display:flex;gap:2rem;flex-wrap:wrap;margin-top:2.2rem;font-size:.95rem;color:var(--muted)}
+.meta b{display:block;color:var(--ink);font:700 1.05rem var(--fd)}
+/* simulator */
+.sim{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:1.4rem;box-shadow:0 24px 50px -30px var(--brand)}
+.sim h3{margin-bottom:.2rem}
+.sim .sub{color:var(--muted);font-size:.92rem;margin-bottom:1rem}
+.dots{display:flex;gap:6px;margin-bottom:1rem}
+.dots span{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.dots span.on{background:var(--brand)}
+label{display:block;font-weight:600;font-size:.92rem;margin:.9rem 0 .3rem}
+select,input[type=date]{width:100%;font:inherit;padding:.7rem .8rem;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.chk{display:flex;gap:.6rem;align-items:center;font-weight:500;margin:.9rem 0}
+.chk input{width:20px;height:20px;accent-color:var(--brand)}
+.msg{margin:.8rem 0;padding:.7rem .9rem;border-radius:10px;font-size:.93rem;background:var(--soft)}
+.msg.err{background:color-mix(in srgb,var(--alert) 14%,transparent);color:var(--alert);font-weight:500}
+.opts{display:grid;gap:.6rem;margin:.6rem 0 1rem}
+.opt{display:flex;justify-content:space-between;gap:.8rem;align-items:center;text-align:left;width:100%;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:.7rem .9rem;cursor:pointer}
+.opt:hover,.opt[aria-pressed=true]{border-color:var(--brand)}
+.opt[aria-pressed=true]{background:var(--soft)}
+.opt small{color:var(--muted);display:block}
+.tag{font-size:.78rem;font-weight:600;padding:.15rem .5rem;border-radius:99px;background:var(--soft);color:var(--brand);white-space:nowrap}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}
+.ticket{border:2px dashed var(--brand);border-radius:14px;padding:1rem;margin:.8rem 0}
+.ticket b{font:800 1.5rem var(--fd);color:var(--brand)}
+/* lists */
+.split{display:grid;grid-template-columns:1fr 1.4fr;gap:3rem}
+.goals{list-style:none;padding:0;margin:0;counter-reset:g}
+.goals li{counter-increment:g;padding:1rem 0 1rem 3rem;border-top:1px solid var(--line);position:relative}
+.goals li::before{content:counter(g);position:absolute;left:0;top:.9rem;width:2rem;height:2rem;border-radius:50%;background:var(--soft);color:var(--brand);font:700 1rem var(--fd);display:grid;place-items:center}
+dl.feat{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
+dl.feat div{border-top:1px solid var(--line);padding:1rem 0}
+dt{font:700 1.1rem var(--fd);margin-bottom:.2rem}
+dd{margin:0;color:var(--muted);font-size:.98rem}
+.band{background:var(--surface);border-block:1px solid var(--line)}
+details{border-top:1px solid var(--line);padding:.9rem 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::after{content:"+";font:700 1.3rem var(--fd);color:var(--brand)}
+details[open] summary::after{content:"–"}
+details ul,details ol{color:var(--muted);margin:.7rem 0 0;padding-left:1.2rem}
+/* beds */
+.beds{width:100%;border-collapse:collapse;margin-top:1rem}
+.beds th,.beds td{text-align:left;padding:.75rem .5rem;border-bottom:1px solid var(--line);font-size:.97rem}
+.beds th{font-weight:600;color:var(--muted);font-size:.88rem}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;border-radius:5px;transition:width .6s}
+.scroll{overflow-x:auto}
+.note{font-size:.88rem;color:var(--muted)}
+/* scope */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+.two ul{list-style:none;padding:0;margin:1rem 0 0}
+.two li{padding:.7rem 0 .7rem 1.6rem;border-top:1px solid var(--line);position:relative}
+.two li small{display:block;color:var(--muted)}
+.in li::before,.out li::before{position:absolute;left:0;font-weight:700}
+.in li::before{content:"✓";color:var(--ok)}.out li::before{content:"✕";color:var(--alert)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin:2rem 0}
+.nums b{display:block;font:800 clamp(2.2rem,5vw,3.4rem) var(--fd);color:var(--brand);line-height:1}
+.nums span{color:var(--muted)}
+.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem 2rem;margin-top:1.5rem}
+.team div{border-top:2px solid var(--brand);padding-top:.7rem}
+.team small{display:block;color:var(--muted)}
+footer{padding:2.5rem 0;border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
+@media (max-width:860px){.hero .wrap,.split,.two,dl.feat{grid-template-columns:1fr}.nums{grid-template-columns:1fr}section{padding:3.2rem 0}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<a class="logo" href="#topo"><i></i>Panaceia</a>
+<nav aria-label="Seções"><a href="#problema">Problema</a><a href="#recursos">Recursos</a><a href="#fluxo">Agendamento</a><a href="#leitos">Leitos</a><a href="#escopo">Escopo</a><a href="#qualidade">Qualidade</a><a href="#plano">Plano</a><a href="#equipe">Equipe</a></nav>
+</div></header>
+
+<main id="topo">
+<section class="hero"><div class="wrap">
+<div>
+<h1>Menos fila. Mais tempo para quem precisa de cuidado.</h1>
+<p class="lead">O Panaceia é um aplicativo que integra os hospitais públicos de Santa Catarina: o paciente agenda consultas e cirurgias com semanas de antecedência, vê leitos disponíveis por perto e chama uma ambulância em emergências.</p>
+<div class="cta"><a class="btn" href="#sim">Simular um agendamento</a><a class="btn ghost" href="#escopo">Ver o escopo do projeto</a></div>
+<div class="meta"><div><b>Governo de SC</b>Patrocinador</div><div><b>Dez/2026 a Dez/2029</b>Duração prevista</div><div><b>Android</b>Plataforma</div></div>
+</div>
+
+<div class="sim" id="sim" aria-live="polite"></div>
+</div></section>
+
+<section id="problema" class="band"><div class="wrap split">
+<div>
+<h2>O problema que o Panaceia resolve</h2>
+<p class="lead">Hoje as filas são desorganizadas, quase não existe agendamento prévio e os hospitais públicos da região se comunicam pouco e devagar.</p>
+<p>Isso afeta pacientes, equipes hospitalares e familiares. Com menos espera e menos sobrecarga, mais esforço fica com quem precisa de atenção.</p>
+</div>
+<ol class="goals">
+<li><h3>Reduzir a fila de espera</h3>Consultas, pedidos de receita e agendamento de cirurgias pelo aplicativo.</li>
+<li><h3>Priorizar com critério</h3>Pacientes organizados por diagnóstico prévio, deficiência e idade.</li>
+<li><h3>Conectar os hospitais</h3>Vagas de leitos, documentos de pacientes e horários de médicos e cirurgiões compartilhados.</li>
+<li><h3>Guardar e compartilhar documentos</h3>Histórico, exames e receitas agilizam diagnósticos e procedimentos.</li>
+</ol>
+</div></section>
+
+<section id="recursos"><div class="wrap">
+<h2>O que o aplicativo entrega</h2>
+<p class="lead">Oito funcionalidades dentro do escopo do projeto.</p>
+<dl class="feat">
+<div><dt>Cadastro de usuários</dt><dd>Pacientes, enfermeiros, diretores, supervisores, médicos e cirurgiões, com áreas de acesso separadas.</dd></div>
+<div><dt>Solicitação de agendamento</dt><dd>Consultas e cirurgias, respeitando a agenda dos profissionais e os pedidos de outros pacientes.</dd></div>
+<div><dt>Painel administrativo</dt><dd>Hospitais atualizam horários, leitos e usuários e concedem níveis de acesso à equipe.</dd></div>
+<div><dt>Integração entre hospitais</dt><dd>Informações em tempo real, sem duplicidade nem perda de dados.</dd></div>
+<div><dt>Ocupação de leitos</dt><dd>Vagas de vários hospitais acompanhadas ao mesmo tempo, com consulta por proximidade.</dd></div>
+<div><dt>Documentos e receitas</dt><dd>Histórico de consultas, cirurgias e exames; receitas emitidas pelo médico após o pedido do paciente.</dd></div>
+<div><dt>Acompanhamento de consultas</dt><dd>Notificações de agendamentos, adiamentos e mudanças.</dd></div>
+<div><dt>Atendimento emergencial 24h</dt><dd>Botão que chama uma ambulância para a localização do paciente e envia um resumo do histórico de saúde.</dd></div>
+</dl>
+</div></section>
+
+<section id="fluxo" class="band"><div class="wrap split">
+<div>
+<h2>Como funciona o agendamento de uma consulta</h2>
+<p class="lead">Caso de uso UC-03: o paciente só recebe a confirmação depois que o sistema revalida a vaga.</p>
+<p>A consulta precisa ser marcada com no mínimo 24 horas e no máximo 2 semanas de antecedência. Tolerância a atrasos, cancelamentos e remarcações seguem as regras de cada instituição.</p>
+<a class="btn" href="#sim">Testar o fluxo</a>
+</div>
+<div>
+<details open><summary>Fluxo principal em 6 etapas</summary><ol>
+<li>Identificar o paciente e conferir os dados cadastrais.</li>
+<li>Informar especialidade e, se exigido, o encaminhamento.</li>
+<li>Escolher o período, dentro da janela permitida.</li>
+<li>Consultar a rede integrada e aplicar os critérios de prioridade.</li>
+<li>Selecionar uma opção e confirmar a intenção.</li>
+<li>Revalidar a vaga, registrar o agendamento e comunicar o paciente e a unidade.</li></ol></details>
+<details><summary>Fluxos alternativos</summary><ul>
+<li>Paciente não autenticado: o sistema pede as credenciais e retoma o fluxo.</li>
+<li>Dados incompletos: os campos a corrigir são destacados sem apagar o que já foi preenchido.</li>
+<li>Encaminhamento ausente: o paciente anexa o documento ou salva o pedido como rascunho.</li>
+<li>Data fora da janela, ou nenhuma opção compatível: o paciente muda o período e pesquisa de novo.</li>
+<li>Cancelamento, remarcação ou adiamento pelo hospital: o estado e a vaga são atualizados e o paciente é avisado.</li></ul></details>
+<details><summary>Exceções tratadas</summary><ul>
+<li>Falha de autenticação ou de validação dos dados: nada é reservado.</li>
+<li>Integração indisponível ou dados inconsistentes: indisponibilidade nunca é lida como vaga livre.</li>
+<li>Conflito de vaga na confirmação: a tentativa é cancelada sem duplicar o horário.</li>
+<li>Falha ao registrar: o sistema não mostra sucesso e evita gravar só uma parte da operação.</li>
+<li>Ausência ou atraso: funcionário autorizado registra a ocorrência e a regra da unidade é aplicada.</li></ul></details>
+</div></div></section>
+
+<section id="leitos"><div class="wrap">
+<h2>Leitos disponíveis por perto</h2>
+<p class="lead">Exemplo da consulta de leitos entre hospitais integrados.</p>
+<div class="scroll"><table class="beds"><thead><tr><th>Unidade</th><th>Livres</th><th>Ocupação</th><th></th></tr></thead><tbody id="beds"></tbody></table></div>
+<p class="note">Dados ilustrativos para demonstração; não representam hospitais reais.</p>
+<button class="btn ghost" id="refresh">Atualizar agora</button>
+</div></section>
+
+<section id="escopo" class="band"><div class="wrap">
+<h2>Escopo do projeto</h2>
+<div class="two">
+<div class="in"><h3>Dentro do escopo</h3><ul>
+<li>Cadastro de usuários</li><li>Solicitação de agendamento</li><li>Painel administrativo</li><li>Integração com hospitais públicos de SC</li><li>Monitoramento da ocupação de leitos</li><li>Armazenamento e emissão de documentos</li><li>Acompanhamento de consultas</li><li>Atendimento emergencial 24h</li></ul></div>
+<div class="out"><h3>Fora do escopo</h3><ul>
+<li>Exames em clínicas de imagem e laboratórios<small>Aumentaria custo e prazo.</small></li>
+<li>Assistente de IA<small>Benefício pequeno diante do custo e risco em emergências.</small></li>
+<li>Atendimento virtual<small>Falta de especialista na equipe; presencial é mais preciso.</small></li>
+<li>Pagamentos de itens não cobertos pelo SUS<small>Exigiria funções extras e muito tempo.</small></li>
+<li>Sistemas além de Windows, macOS e Android</li></ul></div>
+</div></div></section>
+
+<section id="qualidade"><div class="wrap">
+<h2>Metas de qualidade</h2>
+<div class="nums">
+<div><b>AES 256</b><span>bits na transmissão e no armazenamento dos documentos</span></div>
+<div><b>3 s</b><span>de latência máxima em todos os serviços</span></div>
+<div><b>99,5%</b><span>de disponibilidade mensal, exceto manutenções programadas</span></div>
+</div>
+<p>O sistema também previne duplicidade e erros com visualização das alterações, tem arquitetura modular com testes automatizados e deve incluir novos hospitais sem refazer a arquitetura. Pessoas com baixo letramento digital contam com tutoriais e suporte presencial nas unidades.</p>
+</div></section>
+
+<section id="plano" class="band"><div class="wrap split">
+<div>
+<h2>Plano e riscos</h2>
+<p class="lead">Estrutura analítica do projeto (EAP) e os principais riscos para o escopo.</p>
+</div>
+<div>
+<details open><summary>1.1 Gestão do projeto</summary><ul><li>Objetivos e metas</li><li>Planejamento das atividades</li><li>Acompanhamento dos resultados</li></ul></details>
+<details><summary>1.2 Levantamento da situação atual</summary><ul><li>Principais filas de espera</li><li>Quantidade de pacientes</li><li>Especialidades com maior demanda</li></ul></details>
+<details><summary>1.3 Planejamento das soluções</summary><ul><li>Prioridades de atendimento</li><li>Organização de consultas e exames</li><li>Mutirões de atendimento</li></ul></details>
+<details><summary>1.4 Desenvolvimento e implantação</summary><ul><li>Sistema de acompanhamento da fila</li><li>Organização dos agendamentos</li><li>Lembretes de consultas</li><li>Redistribuição de vagas</li></ul></details>
+<details><summary>1.5 Testes e avaliação</summary><ul><li>Teste do sistema de agendamento</li><li>Redução do tempo de espera</li><li>Feedback de pacientes e profissionais</li></ul></details>
+<details><summary>1.6 Entrega e encerramento</summary><ul><li>Apresentação dos resultados</li><li>Entrega à unidade de saúde</li><li>Relatório final</li></ul></details>
+<details><summary>Riscos relacionados ao escopo</summary><ul>
+<li>Integração incompleta: validar sistemas antes da implementação.</li>
+<li>Leitos desatualizados: mostrar dados antes e depois da atualização, com confirmação.</li>
+<li>Falha no acionamento da ambulância: localização por antenas e conectividade do celular.</li>
+<li>Proteção inadequada dos dados: serviços de segurança do governo mais criptografia própria.</li>
+<li>Dificuldade de uso: interface simples, validada com feedback dos pacientes.</li></ul></details>
+</div></div></section>
+
+<section id="equipe"><div class="wrap">
+<h2>Equipe</h2>
+<p class="lead">Turma CCP1AMFLS190828580, Engenharia e Gestão de Projetos. Professores: Armando Cardoso Ribas e Karina Casola Fernandes.</p>
+<div class="team">
+<div>Renan Capela dos Reis<small>Gerente do projeto: cadastro e painel administrativo</small></div>
+<div>Carlos Roberto Tosin Spada<small>Agendamento e integração dos hospitais</small></div>
+<div>André Luís Tosin Spada<small>Atendimento emergencial e receitas</small></div>
+<div>Vinicius Knabben Andrade<small>Armazenamento e emissão de documentos</small></div>
+<div>João Gabriel Guimarães Machado<small>Equipe de desenvolvimento</small></div>
+</div></div></section>
+</main>
+
+<footer><div class="wrap">Panaceia, projeto acadêmico de TI. Patrocinador: Governo de Santa Catarina.</div></footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const day=86400000;
+const fmt=d=>d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const UNITS=['Unidade Florianópolis','Unidade São José','Unidade Joinville','Unidade Blumenau'];
+const DOCS=['Dra. Helena','Dr. Marcos','Dra. Paula','Dr. Rafael'];
+const SPECS=['Clínica geral','Cardiologia','Ortopedia','Pediatria','Dermatologia'];
+const GROUPS=['Adulto','Criança','Idoso (60+)','Pessoa com deficiência'];
+let S={step:0,spec:'',group:'Adulto',ref:false,date:'',slots:[],slot:null,err:''};
+const rng=seed=>()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+function bounds(){const n=new Date();const a=new Date(n.getTime()+day),b=new Date(n.getTime()+14*day);return[a,b]}
+function makeSlots(){
+  const r=rng([...S.spec+S.date].reduce((h,c)=>h*31+c.charCodeAt(0)|0,7));
+  const prio=S.group!=='Adulto';const out=[];
+  UNITS.forEach((u,i)=>{if(r()<.75){const n=1+Math.floor(r()*2);for(let k=0;k<n;k++){const h=8+Math.floor(r()*9);out.push({u,doc:DOCS[(i+k)%4],t:`${String(h).padStart(2,'0')}:${r()<.5?'00':'30'}`,p:false})}}});
+  if(prio)out.push({u:UNITS[0],doc:DOCS[0],t:'07:30',p:true},{u:UNITS[1],doc:DOCS[2],t:'08:00',p:true});
+  out.sort((a,b)=>(b.p-a.p)||a.t.localeCompare(b.t));return out;
+}
+function dots(){return`<div class="dots">${[0,1,2,3].map(i=>`<span class="${i<=S.step?'on':''}"></span>`).join('')}</div>`}
+function render(){
+  const el=$('#sim');const [min,max]=bounds();let h='';
+  if(S.step===0){
+    h=`<h3>Agendar consulta</h3><p class="sub">Simulação do caso de uso UC-03</p>${dots()}
+    <label for="spec">Especialidade</label><select id="spec"><option value="">Selecione</option>${SPECS.map(s=>`<option ${S.spec===s?'selected':''}>${s}</option>`).join('')}</select>
+    <label for="grp">Perfil do paciente</label><select id="grp">${GROUPS.map(s=>`<option ${S.group===s?'selected':''}>${s}</option>`).join('')}</select>
+    <label class="chk"><input type="checkbox" id="ref" ${S.ref?'checked':''}> Tenho encaminhamento</label>
+    ${S.err?`<div class="msg err" role="alert">${S.err}</div>`:''}
+    <div class="row"><button class="btn" id="next">Continuar</button></div>`;
+  }else if(S.step===1){
+    h=`<h3>Quando você prefere?</h3><p class="sub">Permitido de ${fmt(min)} a ${fmt(max)}.</p>${dots()}
+    <label for="dt">Data da consulta</label><input type="date" id="dt" value="${S.date}">
+    ${S.err?`<div class="msg err" role="alert">${S.err}</div>`:''}
+    <div class="row"><button class="btn ghost" id="back">Voltar</button><button class="btn" id="search">Buscar horários</button></div>`;
+  }else if(S.step===2){
+    h=`<h3>Horários em ${fmt(new Date(S.date+'T12:00'))}</h3><p class="sub">${S.spec} · ${S.group}${S.group!=='Adulto'?' · prioridade aplicada':''}</p>${dots()}
+    <div class="opts">${S.slots.map((o,i)=>`<button class="opt" data-i="${i}" aria-pressed="${S.slot===i}"><span>${o.t} · ${o.u}<small>${o.doc}</small></span>${o.p?'<span class="tag">Prioridade</span>':''}</button>`).join('')||'<div class="msg">Nenhum horário compatível. Altere a data e tente de novo.</div>'}</div>
+    ${S.err?`<div class="msg err" role="alert">${S.err}</div>`:''}
+    <div class="row"><button class="btn ghost" id="back">Alterar data</button><button class="btn" id="confirm" ${S.slot===null?'disabled':''}>Confirmar agendamento</button></div>`;
+  }else{
+    const o=S.slots[S.slot];
+    h=`<h3>Agendamento confirmado</h3><p class="sub">A vaga foi revalidada e registrada.</p>${dots()}
+    <div class="ticket"><small>Protocolo</small><br><b>${S.proto}</b><p style="margin:.6rem 0 0">${S.spec}<br>${fmt(new Date(S.date+'T12:00'))}, ${o.t}<br>${o.u} · ${o.doc}</p></div>
+    <p class="note">Você receberá notificações se o hospital alterar ou adiar o horário.</p>
+    <div class="row"><button class="btn ghost" id="again">Novo agendamento</button></div>`;
+  }
+  el.innerHTML=h;bind();
+}
+function bind(){
+  const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+  on('#next',()=>{
+    S.spec=$('#spec').value;S.group=$('#grp').value;S.ref=$('#ref').checked;
+    if(!S.spec)S.err='Escolha uma especialidade para continuar.';
+    else if(S.spec!=='Clínica geral'&&!S.ref)S.err='Esta especialidade exige encaminhamento. Marque a opção quando tiver o documento; nenhum horário foi reservado.';
+    else{S.err='';S.step=1}
+    render();
+  });
+  on('#back',()=>{S.err='';S.slot=null;S.step=S.step-1;render()});
+  on('#search',()=>{
+    S.date=$('#dt').value;const [min,max]=bounds();
+    if(!S.date)S.err='Informe uma data.';
+    else if(S.date<iso(min))S.err='A consulta precisa ser marcada com pelo menos 24 horas de antecedência.';
+    else if(S.date>iso(max))S.err='O limite é de 2 semanas de antecedência. Escolha uma data mais próxima.';
+    else{S.err='';S.slots=makeSlots();S.slot=null;S.step=2}
+    render();
+  });
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S.slot=+b.dataset.i;S.err='';render()});
+  on('#confirm',()=>{
+    if(Math.random()<.2){S.slots.splice(S.slot,1);S.slot=null;S.err='Essa vaga acabou de ser ocupada por outro paciente. Escolha outro horário e confirme de novo.';render();return}
+    S.proto='PAN-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*90000)+10000);S.step=3;render();
+  });
+  on('#again',()=>{S={step:0,spec:'',group:'Adulto',ref:false,date:'',slots:[],slot:null,err:''};render()});
+}
+render();
+
+/* leitos */
+let beds=[{u:'Unidade Florianópolis',t:120,o:96},{u:'Unidade São José',t:80,o:58},{u:'Unidade Joinville',t:150,o:141},{u:'Unidade Blumenau',t:110,o:71},{u:'Unidade Chapecó',t:90,o:63}];
+function drawBeds(){
+  $('#beds').innerHTML=beds.map(b=>{const p=Math.round(b.o/b.t*100),free=b.t-b.o;const c=p>90?'var(--alert)':p>75?'var(--warn)':'var(--ok)';
+  return`<tr><td>${b.u}</td><td><b>${free}</b> de ${b.t}</td><td><div class="bar" role="img" aria-label="${p}% ocupados"><i style="width:${p}%;background:${c}"></i></div></td><td>${p}%</td></tr>`}).join('');
+}
+drawBeds();
+$('#refresh').onclick=()=>{beds=beds.map(b=>({...b,o:Math.max(10,Math.min(b.t,b.o+Math.floor(Math.random()*9)-4))}));drawBeds()};
+</script>
+</body>
+</html>
